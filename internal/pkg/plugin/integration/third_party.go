@@ -10,9 +10,9 @@ type ThirdPartyIntegration struct {
 }
 
 type IntegrationConfig struct {
-	Provider     string            `json:"provider"`
-	Credentials  map[string]string `json:"credentials"`
-	Options      map[string]interface{} `json:"options"`
+	Provider    string                 `json:"provider"`
+	Credentials map[string]string      `json:"credentials"`
+	Options     map[string]interface{} `json:"options"`
 }
 
 func (t *ThirdPartyIntegration) Name() string {

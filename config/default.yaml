@@ -1,0 +1,19 @@
+project:
+  name: go-web-build
+  version: 1.0.0
+environment: development
+server:
+  port: 3000
+  host: localhost
+  dev_mode: true
+build:
+  out_dir: dist
+  source_map: true
+  minify: false
+  cache: true
+  cache_dir: .cache
+  assets:
+    images: assets/images
+templates:
+  directory: templates
+  cache: true

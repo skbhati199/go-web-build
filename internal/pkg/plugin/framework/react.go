@@ -10,10 +10,10 @@ type ReactOptimizer struct {
 }
 
 type OptimizationConfig struct {
-	TreeShaking     bool `json:"treeShaking"`
-	CodeSplitting   bool `json:"codeSplitting"`
-	LazyLoading    bool `json:"lazyLoading"`
-	Prefetching    bool `json:"prefetching"`
+	TreeShaking   bool `json:"treeShaking"`
+	CodeSplitting bool `json:"codeSplitting"`
+	LazyLoading   bool `json:"lazyLoading"`
+	Prefetching   bool `json:"prefetching"`
 }
 
 func (r *ReactOptimizer) Name() string {

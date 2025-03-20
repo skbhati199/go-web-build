@@ -1,0 +1,23 @@
+{
+    "templates": {
+        "react": {
+            "versions": ["1.0.0"],
+            "latest": "1.0.0",
+            "paths": {
+                "base": "react",
+                "config": "config",
+                "assets": "assets"
+            },
+            "variants": [
+                "javascript",
+                "typescript",
+                "redux",
+                "router"
+            ]
+        }
+    },
+    "defaults": {
+        "version": "latest",
+        "variant": "javascript"
+    }
+}

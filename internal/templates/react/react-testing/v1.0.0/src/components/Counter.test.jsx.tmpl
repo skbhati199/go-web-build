@@ -1,0 +1,36 @@
+import { render, screen, fireEvent } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
+import Counter from './Counter';
+
+const mockStore = configureStore([]);
+
+describe('Counter Component', () => {
+  let store;
+
+  beforeEach(() => {
+    store = mockStore({
+      counter: { value: 0 }
+    });
+  });
+
+  test('renders counter value', () => {
+    render(
+      <Provider store={store}>
+        <Counter />
+      </Provider>
+    );
+    expect(screen.getByText(/count: 0/i)).toBeInTheDocument();
+  });
+
+  test('handles increment click', () => {
+    render(
+      <Provider store={store}>
+        <Counter />
+      </Provider>
+    );
+    fireEvent.click(screen.getByText(/increment/i));
+    const actions = store.getActions();
+    expect(actions[0].type).toBe('counter/increment');
+  });
+});

@@ -1,0 +1,17 @@
+environment: development
+
+server:
+  port: 3000
+  host: localhost
+  dev_mode: true
+
+build:
+  out_dir: dist
+  source_map: true
+  minify: true
+  cache: true
+  cache_dir: .cache
+
+templates:
+  directory: templates
+  cache: true

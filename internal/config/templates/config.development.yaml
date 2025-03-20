@@ -1,0 +1,14 @@
+extends: default.yaml
+
+development:
+  port: 3000
+  host: "localhost"
+  hmr:
+    enabled: true
+    overlay: true
+  sourceMap: "eval-source-map"
+  
+build:
+  optimization:
+    minify: false
+    sourceMaps: true

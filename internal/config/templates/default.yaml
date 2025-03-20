@@ -1,0 +1,39 @@
+# Default configuration template
+project:
+  name: ""
+  version: "1.0.0"
+  description: ""
+
+build:
+  outDir: "dist"
+  assets:
+    images: "src/assets/images"
+    styles: "src/assets/styles"
+    fonts: "src/assets/fonts"
+  
+  optimization:
+    minify: true
+    sourceMaps: true
+    splitting: true
+    
+  features:
+    typescript: true
+    sass: true
+    pwa: false
+
+development:
+  port: 3000
+  host: "localhost"
+  proxy:
+    enabled: false
+    target: "http://localhost:8080"
+  
+  hmr:
+    enabled: true
+    overlay: true
+
+production:
+  optimization:
+    compression: true
+    caching: true
+    treeshaking: true

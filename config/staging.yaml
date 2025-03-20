@@ -1,0 +1,13 @@
+environment: staging
+server:
+  port: 8000
+  host: 0.0.0.0
+  dev_mode: true
+build:
+  source_map: true
+  minify: true
+  cache: true
+  cache_dir: .cache
+templates:
+  directory: templates
+  cache: true
