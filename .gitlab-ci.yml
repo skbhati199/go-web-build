@@ -1,0 +1,36 @@
+stages:
+  - test
+  - build
+  - deploy
+  - monitor
+
+test:
+  stage: test
+  image: golang:1.21
+  script:
+    - go test ./... -v
+    - npm run test:e2e
+
+build:
+  stage: build
+  image: golang:1.21
+  script:
+    - make build
+  artifacts:
+    paths:
+      - build/
+
+deploy:
+  stage: deploy
+  script:
+    - make deploy
+  environment:
+    name: production
+    url: https://production.example.com
+
+monitor:
+  stage: monitor
+  script:
+    - curl -X POST ${MONITORING_WEBHOOK}
+  only:
+    - main

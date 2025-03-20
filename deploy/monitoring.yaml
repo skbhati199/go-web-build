@@ -1,0 +1,24 @@
+monitoring:
+  prometheus:
+    scrape_interval: 15s
+    evaluation_interval: 15s
+    alerting:
+      rules:
+        - alert: HighErrorRate
+          expr: error_rate > 0.01
+          for: 5m
+  
+  grafana:
+    dashboards:
+      - name: Application Overview
+        panels:
+          - name: Error Rate
+          - name: Response Time
+          - name: Resource Usage
+  
+  alerts:
+    slack:
+      webhook: ${SLACK_WEBHOOK}
+    email:
+      recipients:
+        - ops@example.com

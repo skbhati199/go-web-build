@@ -1,0 +1,23 @@
+environments:
+  production:
+    url: https://production.example.com
+    monitoring:
+      prometheus: true
+      grafana: true
+      alerts:
+        slack: true
+        email: true
+    rollback:
+      enabled: true
+      versions: 3
+      automatic: false
+
+  staging:
+    url: https://staging.example.com
+    monitoring:
+      prometheus: true
+      grafana: true
+    rollback:
+      enabled: true
+      versions: 5
+      automatic: true
