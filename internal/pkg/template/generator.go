@@ -2,26 +2,27 @@ package template
 
 import (
     "context"
-    "text/template"
     "path/filepath"
+    "text/template"
 )
 
-type Generator struct {
+type TemplateGenerator struct {
     cache  *TemplateCache
-    engine *template.Template
+    config *Config
 }
 
-func NewGenerator() *Generator {
-    return &Generator{
-        cache: NewTemplateCache(),
+func NewTemplateGenerator(config *Config) *TemplateGenerator {
+    return &TemplateGenerator{
+        cache:  NewTemplateCache(),
+        config: config,
     }
 }
 
-func (g *Generator) GenerateProject(ctx context.Context, config ProjectConfig) error {
-    template, err := g.cache.Get(config.Template)
-    if err != nil {
-        return err
-    }
+func (g *TemplateGenerator) GenerateReactProject(ctx context.Context, opts *ReactOptions) error {
+    template := g.getReactTemplate(opts.UseTypeScript)
+    return g.generateFromTemplate(ctx, template, opts)
+}
 
-    return g.engine.ExecuteTemplate(config.OutputDir, template, config.Variables)
+func (g *TemplateGenerator) generateFromTemplate(ctx context.Context, tmpl *Template, data interface{}) error {
+    return tmpl.Execute(data)
 }
