@@ -26,7 +26,7 @@ func TestCLICommands(t *testing.T) {
 	}{
 		{
 			name:    "Create React Project",
-			command: []string{"create", "react-app", "--template", "react-ts"},
+			command: []string{"create", "react-app", "--framework", "react", "--template", "typescript"},
 			timeout: 2 * time.Minute,
 			verify: func(t *testing.T, output string, dir string) {
 				verifyReactProject(t, filepath.Join(dir, "react-app"))

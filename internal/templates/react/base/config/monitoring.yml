@@ -1,0 +1,29 @@
+monitoring:
+  metrics:
+    - name: application_health
+      type: gauge
+      labels:
+        - environment
+        - service
+    - name: deployment_success
+      type: counter
+      labels:
+        - version
+        - environment
+
+alerts:
+  - name: HighErrorRate
+    condition: error_rate > 0.01
+    duration: 5m
+    severity: critical
+    channels:
+      - slack
+      - email
+
+logging:
+  level: info
+  format: json
+  outputs:
+    - type: stdout
+    - type: file
+      path: /var/log/application.log

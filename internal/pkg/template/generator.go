@@ -3,7 +3,7 @@ package template
 import (
 	"context"
 	"fmt"
-	"path/filepath"
+	"os"
 
 	"github.com/sonukumar/go-web-build/internal/template-engine/engine"
 	"github.com/sonukumar/go-web-build/internal/template-engine/version"
@@ -30,6 +30,11 @@ func NewTemplateGenerator(config *Config) *TemplateGenerator {
 }
 
 func (g *TemplateGenerator) GenerateReactProject(ctx context.Context, opts *ReactOptions) error {
+	// Ensure project directory exists
+	if err := os.MkdirAll(opts.ProjectName, 0755); err != nil {
+		return fmt.Errorf("failed to create project directory: %w", err)
+	}
+
 	// Convert ReactOptions to template engine configuration
 	config := map[string]interface{}{
 		"router":       opts.Features.Router,
@@ -38,8 +43,30 @@ func (g *TemplateGenerator) GenerateReactProject(ctx context.Context, opts *Reac
 		"testing":      opts.Features.Testing,
 	}
 
+	// Determine template name based on language
+	templateName := "react-javascript"
+	if opts.UseTypeScript {
+		templateName = "react-typescript"
+	}
+
 	// Generate base React project
-	if err := g.engine.GenerateReactProject(opts.ProjectName, opts.UseTypeScript, config); err != nil {
+
+	// opts.UseTypeScript ? "typescript" : "javascript",
+	var language string
+	if opts.UseTypeScript {
+		language = "typescript"
+	} else {
+		language = "javascript"
+	}
+
+	templateData := &engine.TemplateData{
+		ProjectName:   opts.ProjectName,
+		Framework:     "react",
+		Language:      language,
+		Configuration: config,
+	}
+
+	if err := g.generateFromTemplate(ctx, templateName, templateData); err != nil {
 		return fmt.Errorf("failed to generate React project: %w", err)
 	}
 
@@ -52,24 +79,93 @@ func (g *TemplateGenerator) GenerateReactProject(ctx context.Context, opts *Reac
 }
 
 func (g *TemplateGenerator) addFeatures(ctx context.Context, opts *ReactOptions) error {
-	projectPath := filepath.Clean(opts.ProjectName)
+	// projectPath := filepath.Clean(opts.ProjectName)
 
 	if opts.Features.Router {
-		if err := g.engine.GenerateReactRouterProject(projectPath, nil); err != nil {
+		var language string
+		if opts.UseTypeScript {
+			language = "typescript"
+		} else {
+			language = "javascript"
+		}
+		routerData := &engine.TemplateData{
+			ProjectName: opts.ProjectName,
+			Framework:   "react",
+			Language:    language,
+			Configuration: map[string]interface{}{
+				"routerVersion": "6.14.0",
+			},
+		}
+
+		if err := g.generateFromTemplate(ctx, "react-router", routerData); err != nil {
 			return fmt.Errorf("failed to add router: %w", err)
 		}
 	}
 
 	if opts.Features.StateManager == "redux" {
-		if err := g.engine.GenerateReactReduxProject(projectPath, nil); err != nil {
+		var language string
+		if opts.UseTypeScript {
+			language = "typescript"
+		} else {
+			language = "javascript"
+		}
+		reduxData := &engine.TemplateData{
+			ProjectName: opts.ProjectName,
+			Framework:   "react",
+			Language:    language,
+			Configuration: map[string]interface{}{
+				"reduxVersion":        "4.2.1",
+				"reduxToolkitVersion": "1.9.5",
+			},
+		}
+
+		if err := g.generateFromTemplate(ctx, "react-redux", reduxData); err != nil {
 			return fmt.Errorf("failed to add Redux: %w", err)
 		}
 	}
 
 	if opts.Features.Testing {
-		if err := g.engine.AddTestingSetup(projectPath, nil); err != nil {
+		var language string
+		if opts.UseTypeScript {
+			language = "typescript"
+		} else {
+			language = "javascript"
+		}
+		testingData := &engine.TemplateData{
+			ProjectName: opts.ProjectName,
+			Framework:   "react",
+			Language:    language,
+			Configuration: map[string]interface{}{
+				"testingLibrary": true,
+				"jest":           true,
+			},
+		}
+
+		if err := g.generateFromTemplate(ctx, "react-testing", testingData); err != nil {
 			return fmt.Errorf("failed to add testing setup: %w", err)
 		}
+	}
+
+	// Add build scripts and configuration
+	var language string
+	if opts.UseTypeScript {
+		language = "typescript"
+	} else {
+		language = "javascript"
+	}
+	buildData := &engine.TemplateData{
+		ProjectName: opts.ProjectName,
+		Framework:   "react",
+		Language:    language,
+		Configuration: map[string]interface{}{
+			"optimization": true,
+			"minify":       true,
+			"sourceMaps":   opts.Features.Styling,
+		},
+	}
+
+	if err := g.generateFromTemplate(ctx, "react-build", buildData); err != nil {
+		return fmt.Errorf("failed to add build configuration: %w", err)
 	}
 
 	return nil
