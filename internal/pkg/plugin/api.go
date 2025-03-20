@@ -2,36 +2,38 @@ package plugin
 
 import (
 	"context"
-	"encoding/json"
+	"plugin"
 )
 
 type Plugin interface {
 	Name() string
 	Version() string
-	Init(ctx context.Context, config json.RawMessage) error
-	Execute(ctx context.Context, params map[string]interface{}) error
-	Cleanup(ctx context.Context) error
+	Initialize(ctx context.Context, config map[string]interface{}) error
+	Execute(ctx context.Context) error
 }
 
-type PluginManager struct {
+type Manager struct {
 	plugins map[string]Plugin
 }
 
-func NewPluginManager() *PluginManager {
-	return &PluginManager{
+func NewManager() *Manager {
+	return &Manager{
 		plugins: make(map[string]Plugin),
 	}
 }
 
-func (pm *PluginManager) Register(p Plugin) error {
-	pm.plugins[p.Name()] = p
-	return nil
-}
-
-func (pm *PluginManager) Execute(ctx context.Context, name string, params map[string]interface{}) error {
-	plugin, exists := pm.plugins[name]
-	if !exists {
-		return ErrPluginNotFound
+func (m *Manager) LoadPlugin(path string) error {
+	p, err := plugin.Open(path)
+	if err != nil {
+		return err
 	}
-	return plugin.Execute(ctx, params)
+
+	symbol, err := p.Lookup("New")
+	if err != nil {
+		return err
+	}
+
+	plugin := symbol.(func() Plugin)()
+	m.plugins[plugin.Name()] = plugin
+	return nil
 }
