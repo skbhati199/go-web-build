@@ -1,0 +1,14 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "description": "> An awesome project.",
+  "scripts": {
+    "docs:serve": "docsify serve ."
+  },
+  "keywords": [],
+  "author": "Sonu Kumar",
+  "license": "ISC",
+  "devDependencies": {
+    "docsify-cli": "^4.4.4"
+  }
+}
