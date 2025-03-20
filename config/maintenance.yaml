@@ -1,0 +1,15 @@
+maintenance:
+  dependencies:
+    auto_update: true
+    check_interval: 24h
+    notify_on_updates: true
+    
+  security:
+    scan_schedule: "0 0 * * *"
+    auto_patch: false
+    notify_critical: true
+    
+  performance:
+    monitor_interval: 1h
+    metrics_retention: 30d
+    auto_optimize: true
