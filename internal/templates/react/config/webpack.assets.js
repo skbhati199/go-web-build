@@ -1,38 +1,59 @@
+const path = require('path');
 const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
-const { extendDefaultPlugins } = require('svgo');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const { createLoadingStrategy } = require('./utils/assetLoading');
 
 module.exports = {
   module: {
     rules: [
       {
-        test: /\.(png|jpg|gif|webp)$/i,
-        type: 'asset',
-        parser: {
-          dataUrlCondition: {
-            maxSize: 8 * 1024,
-          },
-        },
+        test: /\.(png|jpg|jpeg|gif|webp)$/i,
+        use: [
+          {
+            loader: 'responsive-loader',
+            options: {
+              adapter: require('responsive-loader/sharp'),
+              sizes: [300, 600, 1200, 2000],
+              placeholder: true,
+              quality: 85
+            }
+          }
+        ]
       },
       {
         test: /\.svg$/,
-        use: ['@svgr/webpack', 'url-loader'],
+        use: ['@svgr/webpack', 'url-loader']
       },
-    ],
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset/resource'
+      }
+    ]
   },
   plugins: [
-    new ImageMinimizerPlugin({
-      minimizerOptions: {
-        plugins: [
-          ['gifsicle', { interlaced: true }],
-          ['mozjpeg', { quality: 80 }],
-          ['optipng', { optimizationLevel: 5 }],
-          ['svgo', {
-            plugins: extendDefaultPlugins([
-              { name: 'removeViewBox', active: false },
-            ]),
-          }],
-        ],
-      },
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: 'public',
+          to: '',
+          globOptions: {
+            ignore: ['**/index.html']
+          }
+        }
+      ]
     }),
-  ],
+    new ImageMinimizerPlugin({
+      minimizer: {
+        implementation: ImageMinimizerPlugin.sharpMinify,
+        options: {
+          encodeOptions: {
+            jpeg: { quality: 85 },
+            webp: { quality: 85 },
+            png: { quality: 85 },
+            avif: { quality: 85 }
+          }
+        }
+      }
+    })
+  ]
 };
