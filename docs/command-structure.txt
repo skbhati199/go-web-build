@@ -1,0 +1,73 @@
+go-web-build Command Structure
+│
+├── cmd/gobuild/main.go
+│   └── cmd.Execute() ──────────────────────┐
+│                                          │
+├── internal/cmd/                          │
+│   ├── root.go                            │
+│   │   ├── rootCmd (cobra.Command)        │
+│   │   ├── Execute() ←────────────────────┘
+│   │   └── init() 
+│   │       └── Configure persistent flags
+│   │
+│   ├── create.go
+│   │   ├── createCmd (cobra.Command)
+│   │   └── runCreate()
+│   │       ├── framework.NewFrameworkAdapter()
+│   │       └── templateengine.NewManager()
+│   │
+│   ├── build.go
+│   │   ├── buildCmd (cobra.Command)
+│   │   └── runBuild()
+│   │       ├── builder.New()
+│   │       └── framework.BuildProject()
+│   │
+│   └── dev.go
+│       ├── devCmd (cobra.Command)
+│       └── runDev()
+│           ├── server.New()
+│           └── watcher.Start()
+│
+├── internal/pkg/
+│   ├── framework/
+│   │   ├── adapter.go
+│   │   │   ├── Adapter interface
+│   │   │   ├── reactAdapter
+│   │   │   │   ├── Initialize()
+│   │   │   │   ├── GenerateProject()
+│   │   │   │   └── BuildProject()
+│   │   │   └── vueAdapter
+│   │   │       ├── Initialize()
+│   │   │       ├── GenerateProject()
+│   │   │       └── BuildProject()
+│   │   │
+│   │   └── builder/
+│   │       └── project.go
+│   │
+│   ├── template/
+│   │   ├── manager.go
+│   │   │   ├── NewManager()
+│   │   │   └── CreateProject()
+│   │   └── validator.go
+│   │
+│   └── server/
+│       ├── dev.go
+│       │   ├── New()
+│       │   └── Start()
+│       └── watcher.go
+│           ├── New()
+│           └── Watch()
+│
+└── internal/config/
+    └── config.go
+        ├── LoadConfig()
+        └── ValidateConfig()
+
+Flow:
+1. main.go → cmd.Execute()
+2. cmd.Execute() → recovery.WrapHandler(rootCmd.Execute)
+3. rootCmd → Subcommands (create, build, dev)
+4. Subcommands → respective pkg implementations
+   - create → framework.Adapter + template.Manager
+   - build → framework.Adapter + builder
+   - dev → server + watcher

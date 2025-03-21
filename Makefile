@@ -1,9 +1,9 @@
 # Variables
 BINARY_NAME=gobuild
-BUILD_DIR=dist
+BUILD_DIR=build
 
 # Default target
-all: build
+all: build test clean
 
 # Build the project
 build:

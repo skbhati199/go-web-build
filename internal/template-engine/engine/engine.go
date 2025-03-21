@@ -13,14 +13,18 @@ import (
 )
 
 type TemplateEngine struct {
-	templatesDir string
+	TemplatesDir string
 	cache        *cache.TemplateCache
 	variables    *variables.VariableManager
 }
 
+func TemplatesDir() string {
+	return filepath.Join("templates")
+}
+
 func NewTemplateEngine(templatesDir string) *TemplateEngine {
 	return &TemplateEngine{
-		templatesDir: templatesDir,
+		TemplatesDir: templatesDir,
 		cache:        cache.NewTemplateCache(24 * time.Hour), // Cache for 24 hours
 		variables:    variables.NewVariableManager(),
 	}
@@ -82,7 +86,7 @@ func (e *TemplateEngine) loadTemplate(name string) (*template.Template, error) {
 		return cached.(*template.Template), nil
 	}
 
-	templatePath := filepath.Join(e.templatesDir, name)
+	templatePath := filepath.Join(e.TemplatesDir, name)
 	tmpl, err := template.ParseGlob(filepath.Join(templatePath, "*.tmpl"))
 	if err != nil {
 		return nil, err
@@ -95,7 +99,7 @@ func (e *TemplateEngine) loadTemplate(name string) (*template.Template, error) {
 
 func (e *TemplateEngine) getTemplateFiles(templateName string) ([]string, error) {
 	var files []string
-	templatePath := filepath.Join(e.templatesDir, templateName)
+	templatePath := filepath.Join(e.TemplatesDir, templateName)
 
 	err := filepath.Walk(templatePath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {

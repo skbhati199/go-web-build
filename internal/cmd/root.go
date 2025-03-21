@@ -52,9 +52,4 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file path")
 	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debug mode")
 	rootCmd.PersistentFlags().StringVar(&env, "env", "", "environment (development, staging, production)")
-
-	// Remove duplicate flag definitions
-	// rootCmd.PersistentFlags().StringP("config", "c", "", "config file path")
-	// rootCmd.PersistentFlags().BoolP("debug", "d", false, "enable debug mode")
-	// rootCmd.PersistentFlags().StringP("env", "e", "", "environment (development, staging, production)")
 }

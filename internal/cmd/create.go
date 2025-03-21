@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
 	templateengine "github.com/skbhati199/go-web-build/internal/template-engine"
@@ -47,9 +48,18 @@ func runCreate(cmd *cobra.Command, args []string) error {
 	// Enable debug output
 	fmt.Printf("Creating project: %s\nFramework: %s\nTemplate: %s\n", projectName, framework, templateName)
 
-	// Get absolute path to templates directory
-	templatesDir := filepath.Join("/Users/sonukumar/go-web-build", "internal", "templates")
-	fmt.Printf("Templates directory: %s\n", templatesDir)
+	// Create template manager with proper path handling
+	templatesDir := filepath.Join("/Users/sonukumar/go-web-build", "templates")
+
+	// Try both directory structures
+	templatePath := filepath.Join(templatesDir, fmt.Sprintf("%s-%s", framework, templateName))
+	if _, err := os.Stat(templatePath); os.IsNotExist(err) {
+		// Try nested structure
+		templatePath = filepath.Join(templatesDir, framework, fmt.Sprintf("react-%s", templateName))
+		if _, err := os.Stat(templatePath); os.IsNotExist(err) {
+			return fmt.Errorf("template not found: %s-%s", framework, templateName)
+		}
+	}
 
 	// Create template manager
 	manager := templateengine.NewManager(templatesDir)

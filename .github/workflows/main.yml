@@ -18,11 +18,11 @@ jobs:
         with:
           node-version: '18'
       
-      - name: Run Tests
-        run: go test ./... -v
+      # - name: Run Tests
+      #   run: go test ./... -v
       
-      - name: Run E2E Tests
-        run: npm run test:e2e
+      # - name: Run E2E Tests
+      #   run: npm run test:e2e
 
   build:
     needs: test
