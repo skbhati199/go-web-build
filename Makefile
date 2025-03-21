@@ -33,6 +33,9 @@ fmt:
 lint:
 	golangci-lint run
 
+dploy:
+	./$(BUILD_DIR)/$(BINARY_NAME)
+
 # Help
 help:
 	@echo "Makefile commands:"
