@@ -38,23 +38,23 @@
     - [x] Support for custom variables and placeholders
     - [x] Template caching mechanism
     
-  - [x] Support for React framework
-    - [x] Basic React template (JavaScript)
-      - [x] Project structure setup
-      - [x] Basic component architecture
-      - [x] Development server configuration
-    - [x] React TypeScript template
-      - [x] TypeScript configuration
-      - [x] Type definitions setup
-      - [x] Component type patterns
-    - [x] React tooling integration
-      - [x] ESLint configuration
-      - [x] Prettier setup
-      - [x] Git hooks (husky)
-    - [x] React testing framework
-      - [x] Jest configuration
-      - [x] React Testing Library setup
-      - [x] Test utilities and helpers
+  - [ ] Support for React framework
+    - [ ] Basic React template (JavaScript)
+      - [ ] Project structure setup
+      - [ ] Basic component architecture
+      - [ ] Development server configuration
+    - [ ] React TypeScript template
+      - [ ] TypeScript configuration
+      - [ ] Type definitions setup
+      - [ ] Component type patterns
+    - [ ] React tooling integration
+      - [ ] ESLint configuration
+      - [ ] Prettier setup
+      - [ ] Git hooks (husky)
+    - [ ] React testing framework
+      - [ ] Jest configuration
+      - [ ] React Testing Library setup
+      - [ ] Test utilities and helpers
     
   - [x] Build System (React-specific)
     - [x] Development mode

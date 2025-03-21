@@ -44,12 +44,22 @@ func runCreate(cmd *cobra.Command, args []string) error {
 
 	projectName := args[0]
 
+	// Enable debug output
+	fmt.Printf("Creating project: %s\nFramework: %s\nTemplate: %s\n", projectName, framework, templateName)
+
 	// Get absolute path to templates directory
-	templatesDir := filepath.Join("/Users/sonukumar/go-web-build", "templates")
+	templatesDir := filepath.Join("/Users/sonukumar/go-web-build", "internal", "templates")
+	fmt.Printf("Templates directory: %s\n", templatesDir)
 
 	// Create template manager
 	manager := templateengine.NewManager(templatesDir)
 
 	// Create project with specified template
-	return manager.CreateProject(projectName, framework, templateName, "", nil)
+	err := manager.CreateProject(projectName, framework, templateName, "", nil)
+	if err != nil {
+		return fmt.Errorf("failed to create project: %w", err)
+	}
+
+	fmt.Printf("Successfully created project %s\n", projectName)
+	return nil
 }
