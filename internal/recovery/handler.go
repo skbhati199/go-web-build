@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/sonukumar/go-web-build/internal/logger"
+	"github.com/skbhati199/go-web-build/internal/logger"
 )
 
 type RecoveryHandler struct {

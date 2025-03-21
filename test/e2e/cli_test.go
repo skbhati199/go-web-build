@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sonukumar/go-web-build/test/utils"
+	"github.com/skbhati199/go-web-build/test/utils"
 )
 
 func TestCLICommands(t *testing.T) {

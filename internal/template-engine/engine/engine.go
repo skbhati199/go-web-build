@@ -8,8 +8,8 @@ import (
 
 	"time"
 
-	"github.com/sonukumar/go-web-build/internal/template-engine/cache"
-	"github.com/sonukumar/go-web-build/internal/template-engine/variables"
+	"github.com/skbhati199/go-web-build/internal/template-engine/cache"
+	"github.com/skbhati199/go-web-build/internal/template-engine/variables"
 )
 
 type TemplateEngine struct {

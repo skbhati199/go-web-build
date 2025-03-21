@@ -13,13 +13,13 @@ Before installing Go Web Build, ensure you have:
 ### Using Go Install
 
 ```bash
-go install github.com/sonukumar/go-web-build@latest
+go install github.com/skbhati199/go-web-build@latest
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/sonukumar/go-web-build.git
+git clone https://github.com/skbhati199/go-web-build.git
 cd go-web-build
 make install
 ```

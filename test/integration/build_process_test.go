@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sonukumar/go-web-build/internal/builder"
-	"github.com/sonukumar/go-web-build/internal/config"
-	"github.com/sonukumar/go-web-build/test/utils"
+	"github.com/skbhati199/go-web-build/internal/builder"
+	"github.com/skbhati199/go-web-build/internal/config"
+	"github.com/skbhati199/go-web-build/test/utils"
 )
 
 type TestBuilder struct {

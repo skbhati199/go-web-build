@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sonukumar/go-web-build/internal/cmd"
+	"github.com/skbhati199/go-web-build/internal/cmd"
 )
 
 func main() {

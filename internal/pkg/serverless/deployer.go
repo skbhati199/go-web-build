@@ -4,27 +4,45 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"time"
 
-	"github.com/sonukumar/go-web-build/internal/pkg/cloud"
-	"github.com/sonukumar/go-web-build/internal/template-engine/engine"
-	"github.com/sonukumar/go-web-build/internal/template-engine/validation"
+	"github.com/skbhati199/go-web-build/internal/template-engine/engine"
+	"github.com/skbhati199/go-web-build/internal/template-engine/validation"
 )
 
-type Deployer struct {
-	provider  Provider
-	config    Config
-	template  *engine.TemplateEngine
-	validator *validation.TemplateValidator
+// Provider defines the interface for serverless deployment providers
+type Provider interface {
+	Configure(ctx context.Context, config ProviderConfig) error
+	Deploy(ctx context.Context, resources []Resource) (*DeploymentResult, error)
+	Remove(ctx context.Context, name string) error
+	GetStatus(ctx context.Context, name string) (*DeploymentStatus, error)
 }
 
-type Config struct {
-	Provider     string
+// ProviderConfig contains configuration for serverless providers
+type ProviderConfig struct {
+	Type         string
 	Region       string
-	Functions    []FunctionConfig
-	Triggers     []TriggerConfig
-	TemplatesDir string
+	Credentials  map[string]string
+	FunctionOpts FunctionOptions
 }
 
+// FunctionOptions contains configuration options for serverless functions
+type FunctionOptions struct {
+	Runtime     string
+	MemorySize  int
+	Timeout     int
+	Environment map[string]string
+}
+
+// Config contains the deployer configuration
+type Config struct {
+	ProviderConfig ProviderConfig
+	Functions      []FunctionConfig
+	Triggers       []TriggerConfig
+	TemplatesDir   string
+}
+
+// FunctionConfig defines a serverless function
 type FunctionConfig struct {
 	Name        string
 	Runtime     string
@@ -32,88 +50,98 @@ type FunctionConfig struct {
 	Timeout     int
 	Environment map[string]string
 	Template    string // Template name for the function
+	Handler     string
+	CodePath    string
 }
 
+// TriggerConfig defines a trigger for a serverless function
 type TriggerConfig struct {
-	Type       string
+	Type       string // http, schedule, queue, etc.
 	Function   string
 	Properties map[string]interface{}
 }
 
-// Fix the typo in DeploymentResult
+// Resource represents a deployable serverless resource
+type Resource struct {
+	Type       string
+	Name       string
+	Properties map[string]interface{}
+}
+
+// DeploymentResult contains the result of a deployment
 type DeploymentResult struct {
-    Resources []Resource
-    Endpoint  string
-    Version   string
+	Resources []Resource
+	Endpoint  string
+	Version   string
+	CreatedAt time.Time
 }
 
-// Add Provider interface
-type Provider interface {
-    Deploy(context.Context, []Resource) (*DeploymentResult, error)
+// DeploymentStatus represents the current status of a deployment
+type DeploymentStatus struct {
+	State     string
+	Resources []ResourceStatus
+	LastError string
+	UpdatedAt time.Time
 }
 
+// ResourceStatus represents the status of a deployed resource
+type ResourceStatus struct {
+	Name   string
+	Type   string
+	State  string
+	URL    string
+	Errors []string
+}
+
+// Deployer handles serverless deployments
+type Deployer struct {
+	provider  Provider
+	config    Config
+	template  *engine.TemplateEngine
+	validator *validation.TemplateValidator
+}
+
+// NewDeployer creates a new serverless deployer
 func NewDeployer(config Config) (*Deployer, error) {
-    provider, err := cloud.NewCloudProvider(config.Provider)
-    if err != nil {
-        return nil, fmt.Errorf("failed to initialize cloud provider: %w", err)
-    }
+	provider, err := NewProvider(config.ProviderConfig.Type)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize provider: %w", err)
+	}
 
-    return &Deployer{
-        provider:  provider,
-        config:    config,
-        template:  engine.NewTemplateEngine(config.TemplatesDir),
-        validator: validation.NewTemplateValidator(config.TemplatesDir),
-    }, nil
+	if err := provider.Configure(context.Background(), config.ProviderConfig); err != nil {
+		return nil, fmt.Errorf("failed to configure provider: %w", err)
+	}
+
+	return &Deployer{
+		provider:  provider,
+		config:    config,
+		template:  engine.NewTemplateEngine(config.TemplatesDir),
+		validator: validation.NewTemplateValidator(config.TemplatesDir),
+	}, nil
 }
 
+// Deploy deploys serverless resources
 func (d *Deployer) Deploy(ctx context.Context) (*DeploymentResult, error) {
-    // Validate and process templates first
-    if err := d.processTemplates(ctx); err != nil {
-        return nil, fmt.Errorf("template processing failed: %w", err)
-    }
+	// Validate and process templates first
+	if err := d.processTemplates(ctx); err != nil {
+		return nil, fmt.Errorf("template processing failed: %w", err)
+	}
 
-    // Prepare cloud configuration
-    cloudConfig := cloud.CloudConfig{
-        Provider: d.config.Provider,
-        Region:   d.config.Region,
-        Resources: cloud.ResourceConfig{
-            Compute: cloud.ComputeConfig{
-                Type: "lambda",
-            },
-        },
-    }
-
-    // Configure cloud provider
-    if err := d.provider.Configure(ctx, cloudConfig); err != nil {
-        return nil, fmt.Errorf("failed to configure cloud provider: %w", err)
-    }
-
-    // Prepare deployment options
-    deployOptions := cloud.DeployOptions{
-        ServiceName: "serverless-app",
-        Version:     "1.0.0",
-        Environment: "production",
-        Labels: map[string]string{
-            "deployment-type": "serverless",
-        },
-    }
-
-    // Deploy using cloud provider
-    if err := d.provider.Deploy(ctx, deployOptions); err != nil {
-        return nil, fmt.Errorf("deployment failed: %w", err)
-    }
-
-    resources := d.prepareResources()
-    result := &DeploymentResult{
-        Resources: resources,
-        Endpoint:  fmt.Sprintf("https://%s.execute-api.%s.amazonaws.com/prod", 
-            deployOptions.ServiceName, d.config.Region),
-        Version:   deployOptions.Version,
-    }
-
-    return result, nil
+	resources := d.prepareResources()
+	return d.provider.Deploy(ctx, resources)
 }
 
+// Remove removes a deployed serverless application
+func (d *Deployer) Remove(ctx context.Context, name string) error {
+	return d.provider.Remove(ctx, name)
+}
+
+// GetStatus gets the status of a deployed serverless application
+func (d *Deployer) GetStatus(ctx context.Context, name string) (*DeploymentStatus, error) {
+	return d.provider.GetStatus(ctx, name)
+}
+
+// processTemplates processes function templates
 func (d *Deployer) processTemplates(ctx context.Context) error {
 	for _, function := range d.config.Functions {
 		if function.Template != "" {
@@ -142,6 +170,7 @@ func (d *Deployer) processTemplates(ctx context.Context) error {
 	return nil
 }
 
+// prepareResources prepares resources for deployment
 func (d *Deployer) prepareResources() []Resource {
 	resources := make([]Resource, 0)
 
@@ -155,7 +184,8 @@ func (d *Deployer) prepareResources() []Resource {
 				"memory":      function.Memory,
 				"timeout":     function.Timeout,
 				"environment": function.Environment,
-				"handler":     fmt.Sprintf("build/functions/%s/index.handler", function.Name),
+				"handler":     function.Handler,
+				"codePath":    function.CodePath,
 			},
 		}
 		resources = append(resources, functionResource)
@@ -175,4 +205,18 @@ func (d *Deployer) prepareResources() []Resource {
 	}
 
 	return resources
+}
+
+// NewProvider creates a new provider based on the provider type
+func NewProvider(providerType string) (Provider, error) {
+	switch providerType {
+	case "aws":
+		return NewAWSProvider(), nil
+	// case "gcp":
+	// 	return NewGCPProvider(), nil
+	// case "azure":
+	// 	return NewAzureProvider(), nil
+	default:
+		return nil, fmt.Errorf("unsupported provider type: %s", providerType)
+	}
 }

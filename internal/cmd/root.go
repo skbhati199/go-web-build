@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/sonukumar/go-web-build/internal/config"
-	"github.com/sonukumar/go-web-build/internal/recovery"
+	"github.com/skbhati199/go-web-build/internal/config"
+	"github.com/skbhati199/go-web-build/internal/recovery"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +26,7 @@ Key Features:
   • Built-in template system for quick project setup
   • Extensible plugin architecture
 
-For detailed documentation, visit: https://github.com/sonukumar/go-web-build`,
+For detailed documentation, visit: https://github.com/skbhati199/go-web-build`,
 	Example: `  # Create a new React project
   gobuild create myapp --framework react --template typescript
 

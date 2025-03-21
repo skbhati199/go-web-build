@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sonukumar/go-web-build/internal/template-engine/engine"
-	"github.com/sonukumar/go-web-build/internal/template-engine/version"
+	"github.com/skbhati199/go-web-build/internal/template-engine/engine"
+	"github.com/skbhati199/go-web-build/internal/template-engine/version"
 )
 
 type TemplateGenerator struct {

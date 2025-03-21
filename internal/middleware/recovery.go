@@ -1,6 +1,6 @@
 package middleware
 
-import "github.com/sonukumar/go-web-build/internal/core/errors"
+import "github.com/skbhati199/go-web-build/internal/core/errors"
 
 type RecoveryMiddleware struct {
 	manager *errors.RecoveryManager

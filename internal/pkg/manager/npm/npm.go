@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/sonukumar/go-web-build/internal/pkg/manager"
+	"github.com/skbhati199/go-web-build/internal/pkg/manager"
 )
 
 type NPM struct {

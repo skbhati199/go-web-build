@@ -4,7 +4,7 @@ import (
 	"context"
 	"path/filepath"
 
-	"github.com/sonukumar/go-web-build/internal/builder/sourcemap"
+	"github.com/skbhati199/go-web-build/internal/builder/sourcemap"
 )
 
 type Builder struct {
