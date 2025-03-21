@@ -3,6 +3,8 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [ master ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ master ]
 
@@ -38,16 +40,62 @@ jobs:
           name: build-artifacts
           path: build/
 
-  deploy:
-    needs: build
+  release:
+    needs: [build]
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - name: Download Artifacts
+      - uses: actions/checkout@v3
+      
+      - name: Download Build Artifacts
         uses: actions/download-artifact@v3
         with:
           name: build-artifacts
-      
-      - name: Deploy
+          path: build
+
+      - name: Create Release Archive
+        run: |
+          tar -czf gobuild-${{ github.ref_name }}.tar.gz -C build gobuild
+          zip -j gobuild-${{ github.ref_name }}.zip build/gobuild
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            gobuild-${{ github.ref_name }}.tar.gz
+            gobuild-${{ github.ref_name }}.zip
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
         env:
-          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
-        run: make deploy
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docs:
+    needs: [release]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Docsify CLI
+        run: npm i docsify-cli -g
+
+      - name: Build Documentation
+        run: |
+          cd docs
+          docsify serve . &
+          sleep 5
+          curl http://localhost:3000 > index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          force_orphan: true
