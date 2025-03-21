@@ -1,4 +1,4 @@
-name: Release CI/CD Pipeline with docs
+name: Documentation Pipeline
 on:
   push:
     branches: [ master ]
@@ -9,30 +9,52 @@ on:
 
 jobs:
   docs:
-      needs: [release]
-      runs-on: ubuntu-latest
-      if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
-      steps:
-        - uses: actions/checkout@v3
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-        - name: Setup Node.js
-          uses: actions/setup-node@v3
-          with:
-            node-version: '18'
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
 
-        - name: Install Docsify CLI
-          run: npm i docsify-cli -g
+      - name: Install dependencies
+        run: |
+          npm install -g docsify-cli
+          npm ci
 
-        - name: Build Documentation
-          run: |
-            cd docs
-            docsify serve . &
-            sleep 5
-            curl http://localhost:3000 > index.html
+      - name: Generate documentation
+        run: |
+          mkdir -p docs
+          cd docs
+          if [ ! -f "index.html" ]; then
+            docsify init .
+          fi
+          
+          # Update version in docs
+          VERSION=$(git describe --tags --always --dirty)
+          echo "Current version: $VERSION" >> _sidebar.md
 
-        - name: Deploy to GitHub Pages
-          uses: peaceiris/actions-gh-pages@v3
-          with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            publish_dir: ./docs
-            force_orphan: true
+      - name: Build documentation
+        run: |
+          cd docs
+          docsify serve . --port 3000 &
+          sleep 5
+          curl -s http://localhost:3000 > index.html
+          pkill -f "docsify serve"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          force_orphan: true
+          commit_message: 'docs: update documentation [skip ci]'
+          enable_jekyll: false
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
