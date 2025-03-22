@@ -1,0 +1,31 @@
+{
+  "name": "go-web-build-docs",
+  "version": "1.0.0",
+  "description": "Documentation for Go Web Build CLI",
+  "scripts": {
+    "docs:dev": "docsify serve .",
+    "docs:build": "docsify init .",
+    "docs:update": "docsify generate ."
+  },
+  "dependencies": {
+    "docsify-cli": "^4.4.4",
+    "docsify-copy-code": "^2.1.1",
+    "docsify-pagination": "^2.6.1",
+    "docsify-tabs": "^1.5.2",
+    "prismjs": "^1.29.0"
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skbhati199/go-web-build.git"
+  },
+  "keywords": [
+    "documentation",
+    "go-web-build",
+    "docsify"
+  ],
+  "author": "Sonukumar",
+  "license": "MIT"
+}
