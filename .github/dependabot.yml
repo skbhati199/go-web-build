@@ -1,0 +1,66 @@
+version: 2
+updates:
+  # Go modules
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    target-branch: "develop"
+    labels:
+      - "dependencies"
+      - "go"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+  # Node.js dependencies for documentation
+  - package-ecosystem: "npm"
+    directory: "/docs"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "documentation"
+    ignore:
+      - dependency-name: "docsify"
+        versions: ["5.x"]
+    commit-message:
+      prefix: "docs"
+      include: "scope"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+
+  # Docker dependencies
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "docker"
+      include: "scope"
+
+  # Development container features
+  - package-ecosystem: "devcontainers"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "devcontainer"
+    commit-message:
+      prefix: "devcontainer"
+      include: "scope"
